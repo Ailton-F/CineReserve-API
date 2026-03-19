@@ -6,3 +6,4 @@ pyvenv.cfg
 tests/__pycache__
 poetry.lock
 src/db.sqlite3
+.env

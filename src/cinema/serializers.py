@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Movie, CinemaHall, Session, Seat
+from .models import Movie, CinemaHall, Session, Seat, Ticket
 
 class MovieSerializer(serializers.ModelSerializer):
     class Meta:
@@ -10,6 +10,20 @@ class CinemaHallSerializer(serializers.ModelSerializer):
     class Meta:
         model = CinemaHall
         fields = '__all__'
+
+class SeatSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Seat
+        fields = ['id', 'row', 'number']
+
+class SeatStatusSerializer(serializers.Serializer):
+    id = serializers.IntegerField()
+    row = serializers.CharField()
+    number = serializers.IntegerField()
+    status = serializers.ChoiceField(choices=['available', 'locked', 'purchased'])
+
+class ReservationSerializer(serializers.Serializer):
+    seat_id = serializers.IntegerField()
 
 class SessionSerializer(serializers.ModelSerializer):
     movie = MovieSerializer(read_only=True)
