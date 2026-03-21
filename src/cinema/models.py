@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.conf import settings
 
@@ -42,7 +43,7 @@ class Ticket(models.Model):
     seat = models.ForeignKey(Seat, related_name='tickets', on_delete=models.CASCADE)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='tickets', on_delete=models.CASCADE)
     purchased_at = models.DateTimeField(auto_now_add=True)
-    digital_id = models.UUIDField(unique=True, editable=False, default=None, null=True)
+    digital_id = models.UUIDField(unique=True, editable=False, default=uuid.uuid4)
 
     class Meta:
         unique_together = ('session', 'seat')

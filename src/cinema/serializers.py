@@ -25,6 +25,16 @@ class SeatStatusSerializer(serializers.Serializer):
 class ReservationSerializer(serializers.Serializer):
     seat_id = serializers.IntegerField()
 
+class CheckoutSerializer(serializers.Serializer):
+    session_id = serializers.IntegerField()
+    seat_id = serializers.IntegerField()
+
+class TicketSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ticket
+        fields = ['id', 'session', 'seat', 'user', 'purchased_at', 'digital_id']
+        read_only_fields = ['id', 'user', 'purchased_at', 'digital_id']
+
 class SessionSerializer(serializers.ModelSerializer):
     movie = MovieSerializer(read_only=True)
     hall = CinemaHallSerializer(read_only=True)
