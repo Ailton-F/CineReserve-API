@@ -37,6 +37,7 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_HOST=db
       - REDIS_URL=redis://redis:6379/1
+      - PYTHONPATH=/app/src
     depends_on:
       db:
         condition: service_healthy
@@ -46,6 +47,8 @@ services:
 
   celery_worker:
     build: .
+    volumes:
+      - .:/app
     command: celery -A cinereserve_api worker --loglevel=info
     environment:
       - POSTGRES_DB=cinereserve
@@ -54,6 +57,26 @@ services:
       - POSTGRES_HOST=db
       - REDIS_URL=redis://redis:6379/1
       - CELERY_BROKER_URL=redis://redis:6379/0
+      - PYTHONPATH=/app/src
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  celery_beat:
+    build: .
+    volumes:
+      - .:/app
+    command: celery -A cinereserve_api beat --loglevel=info
+    environment:
+      - POSTGRES_DB=cinereserve
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_HOST=db
+      - REDIS_URL=redis://redis:6379/1
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - PYTHONPATH=/app/src
     depends_on:
       db:
         condition: service_healthy
