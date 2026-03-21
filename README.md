@@ -1,9 +1,34 @@
+# **RUNNING THE CODE**
+
+The application runs with docker so, just open the terminal and run ``docker compose up -d``, note that the flag ``-d`` run the containers in the background. Also the code is using factory boy to mockup data, if you dont need this, change the ``DJANGO_DEBUG`` variable in the ``docker-compose.yml`` to False
+
+### IMPORTANT!!!!!
+
+If the migrations failed check if the file ``entrypoint.sh`` is saved in LF mode instead of CRLF.
+
+### Docs
+
+All the documentation needed is in documentation.json, just import to Postman and try them!
+
+### Tests
+**IMPORTANT**: All the commands below should be used with ``docker compose exec api <command>``
+Run all tests at once
+From the root of your project, run: ``pytest``
+If you are using Poetry and not already in a virtual environment, use: ``poetry run pytest``
+
+Run tests one by one (or specifically)
+
+I suggest running one by one like this:
+- ``docker compose exec api poetry run pytest tests``
+- ``docker compose exec api poetry run pytest src/cinema``
+
+---
+
 ## **🏁 DESCRIPTION**
 
 ---
 
 The CineReserve API is a high-performance, scalable RESTful backend designed to manage the complexities of modern cinema operations. Built with a focus on data integrity and concurrency control, the system provides a comprehensive portal for movie enthusiasts to discover films, view real-time seat availability, and secure tickets through a robust reservation flow.
-
 
 ## 📄 TECHNICAL REQUIREMENTS
 
@@ -51,7 +76,6 @@ The CineReserve API is a high-performance, scalable RESTful backend designed to 
 * Your project must be stored in a public git repository.
 * ***Failing this criteria will eliminate you immediately***
 
-
 ## 🌟 BONUS POINTS
 
 ---
@@ -71,6 +95,8 @@ The CineReserve API is a high-performance, scalable RESTful backend designed to 
 
 ## 👨🏼‍🏫 USE CASES
 
+ENV:
+
 ---
 
 Now you are building an API for a local  ***Movie Theater*** *'s *tickets application. This place is called "Cinépolis Natal". This software will use the following APIs:
@@ -88,7 +114,7 @@ Now you are building an API for a local  ***Movie Theater*** *'s *tickets applic
 
 * dawce
 
-CASE 4**: Seat Map Visualization per movie session**
+**CASE 4**: Seat Map Visualization per movie session**
 
 * The system must distinguish between seats that are  **Available** , **Reserved** (temporarily locked), or  **Purchased** .
 * All tickets are free
@@ -97,7 +123,6 @@ CASE 4**: Seat Map Visualization per movie session**
 
 * Upon selecting a seat, the system must trigger a **temporary lock** (e.g., 10-minute timeout).
 * This prevents other users from selecting the same seat during the checkout.
-* **Note:** Full-time candidates **must** implement this using Redis; Trainees may use a simpler database-level approach if preferred.
 
 **CASE 6: Checkout & Ticket Generation**
 

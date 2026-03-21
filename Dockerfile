@@ -30,8 +30,15 @@ RUN poetry install --no-root
 # Copy the rest of the application code
 COPY . .
 
+# Copy and setup entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
 # Expose port 8000
 EXPOSE 8000
+
+# Set entrypoint
+ENTRYPOINT ["/app/entrypoint.sh"]
 
 # Command to run the application
 CMD ["python", "src/manage.py", "runserver", "0.0.0.0:8000"]

@@ -38,6 +38,7 @@ services:
       - POSTGRES_HOST=db
       - REDIS_URL=redis://redis:6379/1
       - PYTHONPATH=/app/src
+      - DJANGO_DEBUG=True
     depends_on:
       db:
         condition: service_healthy
@@ -49,6 +50,7 @@ services:
     build: .
     volumes:
       - .:/app
+    entrypoint: []
     command: celery -A cinereserve_api worker --loglevel=info
     environment:
       - POSTGRES_DB=cinereserve
@@ -58,6 +60,7 @@ services:
       - REDIS_URL=redis://redis:6379/1
       - CELERY_BROKER_URL=redis://redis:6379/0
       - PYTHONPATH=/app/src
+      - DJANGO_DEBUG=True
     depends_on:
       db:
         condition: service_healthy
@@ -68,6 +71,7 @@ services:
     build: .
     volumes:
       - .:/app
+    entrypoint: []
     command: celery -A cinereserve_api beat --loglevel=info
     environment:
       - POSTGRES_DB=cinereserve
@@ -77,6 +81,7 @@ services:
       - REDIS_URL=redis://redis:6379/1
       - CELERY_BROKER_URL=redis://redis:6379/0
       - PYTHONPATH=/app/src
+      - DJANGO_DEBUG=True
     depends_on:
       db:
         condition: service_healthy
