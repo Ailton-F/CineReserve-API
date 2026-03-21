@@ -1,13 +1,13 @@
 # Use official Python runtime as a parent image
 FROM python:3.13-slim
 
-# Set environment variables
+# Environment
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV POETRY_VERSION=2.0.0
 ENV POETRY_VIRTUALENVS_CREATE=false
 
-# Install system dependencies
+# System deps
 RUN apt-get update && apt-get install -y \
     libpq-dev \
     gcc \
@@ -18,27 +18,27 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sSL https://install.python-poetry.org | python3 -
 ENV PATH="/root/.local/bin:$PATH"
 
-# Set work directory
+# Workdir
 WORKDIR /app
 
-# Copy project files
-COPY pyproject.toml ./
+# Copy dependencies
+COPY pyproject.toml poetry.lock* ./
 
-# Install dependencies
+# Install deps (inclui gunicorn!)
 RUN poetry install --no-root
 
-# Copy the rest of the application code
+# Copy code
 COPY . .
 
-# Copy and setup entrypoint script
+# Copy entrypoint
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 # Expose port 8000
 EXPOSE 8000
 
-# Set entrypoint
+# Entry
 ENTRYPOINT ["/app/entrypoint.sh"]
 
-# Command to run the application
-CMD ["python", "src/manage.py", "runserver", "0.0.0.0:8000"]
+# Default command
+CMD ["gunicorn", "src.config.wsgi:application", "--bind", "0.0.0.0:8000"]
