@@ -106,3 +106,54 @@ class ReservationTests(TestCase):
         # Find seat 1
         seat_status = next(s for s in response.data if s['id'] == self.seat1.id)
         self.assertEqual(seat_status['status'], 'purchased')
+
+    def test_checkout_success(self):
+        # 1. Lock a seat
+        self.client.force_authenticate(user=self.user)
+        self.client.post(self.reserve_url, {'seat_id': self.seat1.id})
+        
+        # 2. Proceed to checkout
+        checkout_url = reverse('checkout')
+        data = {
+            'session_id': self.session.id,
+            'seat_id': self.seat1.id
+        }
+        
+        response = self.client.post(checkout_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertTrue('digital_id' in response.data)
+        
+        # Verify ticket in DB
+        self.assertTrue(Ticket.objects.filter(session=self.session, seat=self.seat1, user=self.user).exists())
+        
+        # Verify lock is removed
+        lock_key = f"lock:session:{self.session.id}:seat:{self.seat1.id}"
+        self.assertIsNone(cache.get(lock_key))
+
+    def test_checkout_without_lock(self):
+        self.client.force_authenticate(user=self.user)
+        checkout_url = reverse('checkout')
+        data = {
+            'session_id': self.session.id,
+            'seat_id': self.seat1.id
+        }
+        
+        response = self.client.post(checkout_url, data)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        self.assertEqual(response.data['detail'], 'You must have a valid lock on this seat to proceed to checkout.')
+
+    def test_my_tickets_list(self):
+        # Create a ticket for the user
+        Ticket.objects.create(session=self.session, seat=self.seat1, user=self.user)
+        
+        # Create a ticket for another user
+        Ticket.objects.create(session=self.session, seat=self.seat2, user=self.other_user)
+        
+        self.client.force_authenticate(user=self.user)
+        my_tickets_url = reverse('my_tickets')
+        
+        response = self.client.get(my_tickets_url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Should only see their own ticket
+        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data['results'][0]['seat'], self.seat1.id)
